@@ -1,0 +1,84 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>숫자야구</title>
+</head>
+<body>
+<form id = "form">
+  <input type="text" id="input">
+  <button>확인</button>
+</form>
+<div id="logs"></div>
+<script>
+  const $input = document.querySelector('#input');
+  const $form = document.querySelector('#form');
+  const $logs = document.querySelector('#logs');
+
+  const numbers = [];   //[1,2,3,4,5,6,7,8,9]
+  for (let n = 0; n < 9 ; n += 1){
+    numbers.push(n + 1);
+  }
+  const answer = [];
+  for (let n = 0; n < 4; n += 1){
+    const index = Math.floor(Math.random()*(numbers.length)); //numbers 배열의 길이가 줄어드니까
+    answer.push(numbers[index]);
+    numbers.splice(index, 1); //numbers에서 썼으니까 지움
+  }
+
+  console.log(answer);
+
+  const tries = []; //시도했던 숫자들의 배열
+  function checkInput(input){
+    if (input.length !== 4){ //길이가 4가 아닌가
+      return alert('4자리 숫자를 입력해주세요.');
+    }
+    if (new Set(input).size !== 4){ //중복된 숫자 있는지
+      return alert('중복되지 않게 입력해주세요.');
+      //new Set(input)은 중복을 제거한 배열이라고 보면 됨
+    }
+    if (tries.includes(input)){
+      return alert('이미 시도한 값입니다.');
+      //들어있는지 확인하는 함수 includes
+    }
+    return true; //통과!
+  } //검사하는 코드
+
+
+  $form.addEventListener('submit', (event) =>{
+    event.preventDefault(); //기본동작 막기
+    const value = $input.value; //입력한 거에 대한 value다. event.target[0]도 가능 
+    $input.value = ''; //다음값 쉽게 입력하라고 지워줌 이건 센스
+    const valid = checkInput(value); //checkInput으로 value를 저 함수로 빼줌
+    if(!valid){
+      return;
+    }
+    if(answer.join('') === value){  //join('')    [3, 1, 4, 6] -> '3146' 배열을 문자열로 바꾸는 함수
+      $logs.textContent = '홈런!';
+      return;
+    }
+    if (tries.length >= 9){
+      $logs.appendChild(document.createTextNode(`패배! 정답은 ${answer.join('')}`));
+      //  appendChild가 있긴하지만 실제로 append를 많이 씀
+      return;
+    }
+
+    let strike = 0;
+    let ball = 0;
+    //   answer :3146   value: 1234
+    for (let i = 0; i < answer.length; i++){
+      const index = value.indexOf(answer[i]); //value에서 answer배열에 해당하는 값이 있는지 찾는거임 
+      if(index > -1){ //일치하는 숫자 발견!
+        if(index === i){ //자리수까지 같다니
+          strike += 1;
+        } else { //자리수는 다르니까
+          ball += 1;
+        }
+      }
+    }
+    $logs.append(`${value} : ${strike} 스트라이크 ${ball} 볼`, document.createElement('br'));
+    tries.push(value);
+
+  });
+</script>  
+</body>
+</html>

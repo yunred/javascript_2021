@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <title>로또추첨기</title>
+  <style>
+    .ball {
+      display: inline-block;
+      border: 1px solid black;
+      border-radius: 20px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 20px;
+      text-align: center;
+      margin-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <form id="form">
+    <input type="text" id="input">
+    <button>확인</button>
+  </form>
+<div id="result">추첨 결과는? </div>
+<div id="bonus">보너스: </div>
+<div id="correct"> 몇 개 맞혔는가? </div>
+<script>
+
+
+  const $result = document.querySelector('#result'); 
+  const $bonus = document.querySelector('#bonus');
+  const $input = document.querySelector('#input');
+  const $form = document.querySelector('#form');
+  const $correct = document.querySelector('#correct');
+
+  const myselect = []; //배열에 하나씩 넣기
+  $form.addEventListener('submit', (event) =>{
+    event.preventDefault(); //기본동작 막기
+    myselect.push(Number($input.value));
+    if (myselect.length >= 7){
+      start(myselect);
+      myselect = [];
+    }
+    $input.value ='';
+  })
+
+  
+  function start(myselect){
+    const candidate = Array(45).fill().map((v , i) => i + 1); //index에 1 더하기
+    //45개를 랜덤으로 다 섞고, 거기서 7개 잘라서 쓰기
+    const shuffle = [];
+    while (candidate.length> 0 ){
+      const random = Math.floor(Math.random() * candidate.length); //무작위 인덱스 뽑기
+      const spliceArray = candidate.splice(random, 1); // splice해서 뽑은 값을 배열에 할당(candidate배열은 하나씩 줄어듦)
+      const value = spliceArray[0]; //그 배열값을 value에 전달
+      shuffle.push(value); // suffle에 push해줌
+    }
+
+    console.log(shuffle);
+    const winBalls = shuffle.splice(0,6).sort((a,b) => a - b); //6개를 자르고, 정렬하는 매서드
+    const bonus = shuffle[6]; //7번째 공을 가져오는거
+    console.log(winBalls, bonus); 
+    
+    for (let i = 0; i < winBalls.length; i++){
+      setTimeout(() => {
+        drawBall(winBalls[i], $result);
+      }, (i+1) * 1000)
+    }
+
+    setTimeout(() => {
+      drawBall(bonus, $bonus);
+      $correct.append(`${score} 개 맞혔습니다!`); //보너스 나올 때 내가 몇개 맞혔는지 나오게
+    }, 7000); 
+
+    const drawBall = (number, $parent) => {
+      const $ball = document.createElement('div'); //div태그를 만들기
+      $ball.className = 'ball'; //javascript에서는 class가 아니라 className이다
+      colorize(number, $ball);
+      $ball.textContent = number; //거기다가 뽑은 공 보여주기
+      $parent.appendChild($ball);
+  
+    }
+  
+
+    let score = 0; //맞힌 갯수
+    for(let i=0; i<winBalls.length; i++){
+      const index = winBalls.indexOf(myselect[i]);
+      if(index>-1){
+        score += 1;
+      }
+    }
+  console.log(myselect); //내가 선택한거 보여주기
+
+  }
+
+  function colorize(number, $tag) {
+    if(number < 10){
+      $tag.style.backgroundColor = 'red';
+      $tag.style.color = 'white';
+    } else if (number < 20) {
+      $tag.style.backgroundColor = 'orange';
+    } else if (number < 30) {
+      $tag.style.backgroundColor = 'yellow';
+    } else if (number < 40) {
+      $tag.style.backgroundColor = 'blue';
+      $tag.style.color = 'white';
+    }else{
+      $tag.style.backgroundColor = 'green';
+      $tag.style.color = 'white';
+    }
+  }
+
+</script>
+</body>
