@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>반응속도</title>
+<style>
+  #screen {
+    width: 300px;
+    height: 200px;
+    text-align: center;
+    user-select: none;
+  }
+  #screen.waiting {           /*id가 screen이고 class가 waiting임*/
+    background-color: aqua;
+  }
+  #screen.ready {
+    background-color: red;
+    color: white;
+  }
+  #screen.now {
+    background-color: greenyellow;
+  }
+</style>
+</head>
+
+<body>
+<div id="screen" class="waiting">클릭해서 시작하세요</div> 
+<div id="result"></div>
+<script>
+  const $screen = document.querySelector('#screen');
+  const $result = document.querySelector('#result');
+
+  let startTime;
+  let endTime;
+  const records = [];
+  let timeoutId; //타이머 돌아가는걸 멈추려고
+  
+ 
+  $screen.addEventListener('click', (event) => {
+    if (event.target.classList.contains('waiting')) { //파랑
+      //event.target은 $screen은 같음 
+      //태그.classList.contains(클래스명) 은 해당 클래스명이 포함되어있을 때 true반환
+      $screen.classList.replace('waiting','ready')
+      $screen.textContent = '초록색이 되면 클릭하세요';
+      timeoutId = setTimeout(function(){ //빨강이 됐을 때
+        startTime = new Date(); 
+        $screen.classList.remove('ready');
+        $screen.classList.add('now');
+        $screen.textContent = "클릭하세요!"
+        //시간 재기
+      }, Math.floor(Math.random() * 1000) + 2000); //2000~3000 사이 수      
+    }else if(event.target.classList.contains('ready')){ //빨강
+      clearTimeout(timeoutId); //타이머가 필요없을 때는 꼭 제거해줘야함
+      $screen.classList.remove('ready');
+      $screen.classList.add('waiting');
+      $screen.textContent = '너무 성급하시군요!?ㄱ-'
+
+    }else if(event.target.classList.contains('now')){ //초록
+      endTime = new Date();
+      const current = endTime - startTime;
+      records.push(current); //현재 속도를 배열에 추가
+      const average = records.reduce((a,c) => a + c) /records.length;
+      $result.textContent = `현재 ${current}ms 평균: ${average}ms`;
+      const topFive = records.sort((p, c) => p - c).slice(0,5);
+      topFive.forEach((top, index) => { //forEach 배열에 대한 반복문
+        $result.append(
+          document.createElement('br'),
+          `${index + 1}위 : ${top}ms`,
+        )
+      })
+
+      /*
+      records.sort((a,b) => {
+        return a - b;
+      });
+      for(i = 0; i < records.length; i++){
+          console.log(records)
+          $result.append(document.createElement('br'));
+          $result.append(`${i+1}등 : ${records[i]}`);
+        }
+      }
+      */
+
+      startTime = null;
+      endTime = null;
+      $screen.classList.remove('now');
+      $screen.classList.add('waiting');
+      $screen.textContent = '클릭해서 시작하세요';
+      //시간 재기
+      //시간 차이 저장
+
+    }
+  });
+
+
+</script>
+</body>
+</html>
