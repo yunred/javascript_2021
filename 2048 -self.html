@@ -84,8 +84,8 @@
     });
   }
   // data = [
-  //   [32, 2, 4, 2],
-  //   [64, 4, 8, 4],
+  //   [32, 0, 4, 2],
+  //   [64, 4, 0, 4],
   //   [2, 1024, 1024, 32],
   //   [32, 16, 64, 4],
   // ];
@@ -100,14 +100,14 @@
         const newData = [[], [], [], []]; //임시 저장
         data.forEach((rowData, i) => {//행에 대해
           rowData.forEach((cellData, j) => {
-            if (cellData) { // newData = [2, 2, 4] //cellDate가 있을 때
+            if (cellData) { // newData = [2, 2, 4]
               const currentRow = newData[i] // i는 0일때
               const prevData = currentRow[currentRow.length - 1];
               if (prevData === cellData) { // 이전 값과 지금 값이 같으면 2,2
                 const score = parseInt($score.textContent);
                 $score.textContent = score + currentRow[currentRow.length - 1] * 2;
                 currentRow[currentRow.length - 1] *= -2; //한 번에 계산안되게 하기 위해
-              } else {
+              } else { //비어있지않고 이전값과 같지 않음
                 newData[i].push(cellData);  //빈칸 제외하고 왼쪽칸으로 넣은거
               }
             }
@@ -151,7 +151,7 @@
         data.forEach((rowData, i) => {
           rowData.forEach((cellData, j) => {
             if (cellData) {
-              const currentRow = newData[j]
+              const currentRow = newData[j] 
               const prevData = currentRow[currentRow.length - 1];
               if (prevData === cellData) {
                 const score = parseInt($score.textContent);
